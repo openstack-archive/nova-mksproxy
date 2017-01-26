@@ -1,6 +1,6 @@
-========
+=====
 Usage
-========
+=====
 
 To use nova-mksproxy in a project::
 
