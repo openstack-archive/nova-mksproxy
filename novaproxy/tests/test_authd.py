@@ -33,10 +33,10 @@ class AuthdRequestHandler(testtools.TestCase):
                 '200 OK']
 
         def fake_recv(len):
-            return msgs.pop(0)
+            return msgs.pop(0).encode('ascii')
 
         def fake_getpeercert(binary_form=True):
-            return 'fake-certificate'
+            return 'fake-certificate'.encode('ascii')
 
         sock = mock.MagicMock()
         sock.recv = fake_recv
@@ -56,10 +56,10 @@ class AuthdRequestHandler(testtools.TestCase):
                 '200 OK']
 
         def fake_recv(len):
-            return msgs.pop(0)
+            return msgs.pop(0).encode('ascii')
 
         def fake_getpeercert(binary_form=True):
-            return 'fake-certificate'
+            return 'fake-certificate'.encode('ascii')
 
         sock = mock.MagicMock()
         sock.recv = fake_recv
@@ -79,10 +79,10 @@ class AuthdRequestHandler(testtools.TestCase):
                 '200 OK']
 
         def fake_recv(len):
-            return msgs.pop(0)
+            return msgs.pop(0).encode('ascii')
 
         def fake_getpeercert(binary_form=True):
-            return 'fake-certificate'
+            return 'fake-certificate'.encode('ascii')
 
         sock = mock.MagicMock()
         sock.recv = fake_recv

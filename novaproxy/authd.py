@@ -14,14 +14,14 @@
 #    under the License.
 
 import base64
-import Cookie
 import hashlib
 import json
 import os
 import socket
 import ssl
-import urlparse
 
+from six.moves import http_cookies as Cookie
+import six.moves.urllib.parse as urlparse
 import websockify
 
 
@@ -36,7 +36,7 @@ VMAD_CONNECT_CMD = "CONNECT"
 
 
 def expect(sock, code):
-    line = sock.recv(1024)
+    line = sock.recv(1024).decode('ascii')
     recv_code, msg = line.split()[0:2]
     recv_code = int(recv_code)
     if code != recv_code:
@@ -55,16 +55,18 @@ def handshake(host, port, ticket, cfg_file, thumbprint):
     h.update(cert)
     if thumbprint != h.hexdigest():
         raise Exception("Server thumbprint doesn't match")
-    sock.write("%s %s\r\n" % (VMAD_USER_CMD, ticket))
+    sock.sendall(("%s %s\r\n" % (VMAD_USER_CMD, ticket)).encode('ascii'))
     expect(sock, VMAD_NEEDPASSWD)
-    sock.write("%s %s\r\n" % (VMAD_PASS_CMD, ticket))
+    sock.sendall(("%s %s\r\n" % (VMAD_PASS_CMD, ticket)).encode('ascii'))
     expect(sock, VMAD_LOGINOK)
     rand = os.urandom(12)
-    rand = base64.b64encode(rand)
-    sock.write("%s %s\r\n" % (VMAD_THUMB_CMD, rand))
+    rand_b = base64.b64encode(rand)
+    rand_s = rand_b.decode('ascii')
+    sock.sendall(("%s %s\r\n" % (VMAD_THUMB_CMD, rand_s)).encode('ascii'))
     thumbprint2 = expect(sock, VMAD_OK)
     thumbprint2 = thumbprint2.replace(':', '').lower()
-    sock.write("%s %s mks\r\n" % (VMAD_CONNECT_CMD, cfg_file))
+    sock.sendall(
+        ("%s %s mks\r\n" % (VMAD_CONNECT_CMD, cfg_file)).encode('ascii'))
     expect(sock, VMAD_OK)
     sock2 = ssl.wrap_socket(sock)
     cert2 = sock2.getpeercert(binary_form=True)
@@ -72,7 +74,7 @@ def handshake(host, port, ticket, cfg_file, thumbprint):
     h.update(cert2)
     if thumbprint2 != h.hexdigest():
         raise Exception("Second thumbprint doesn't match")
-    sock2.write(rand)
+    sock2.sendall(rand_b)
     return sock2
 
 

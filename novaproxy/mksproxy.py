@@ -16,8 +16,8 @@ import os
 import sys
 
 import argparse
-import authd
 from novaclient import client
+from novaproxy import authd
 import websockify
 import logging
 
