@@ -42,6 +42,20 @@ def main():
                              "$OS_TENANT_NAME)",
                         default=os.environ.get("OS_PROJECT_NAME",
                                    os.environ.get("OS_TENANT_NAME")))
+    parser.add_argument("--project-domain-id",
+                        help="OpenStack project domain id "
+                             "(default $OS_PROJECT_DOMAIN_ID)",
+                        default=os.environ.get("OS_PROJECT_DOMAIN_ID",
+                                               "default"))
+    parser.add_argument("--project-domain-name",
+                        help="OpenStack project domain name")
+    parser.add_argument("--user-domain-id",
+                        help="OpenStack user domain id "
+                             "(default $OS_USER_DOMAIN_ID)",
+                        default=os.environ.get("OS_USER_DOMAIN_ID",
+                                               "default"))
+    parser.add_argument("--user-domain-name",
+                        help="OpenStack user domain name")
     parser.add_argument("--auth-url",
                         help="OpenStack auth url (default $OS_AUTH_URL)",
                         default=os.environ.get("OS_AUTH_URL"))
@@ -68,7 +82,12 @@ def main():
         logger.setLevel(logging.DEBUG)
 
     nova_client = client.Client("2.31", args.username, args.password,
-                                args.project, args.auth_url, logger=logger)
+                                project_name=args.project,
+                                project_domain_id=args.project_domain_id,
+                                project_domain_name=args.project_domain_name,
+                                user_domain_id=args.user_domain_id,
+                                user_domain_name=args.user_domain_name,
+                                auth_url=args.auth_url, logger=logger)
 
     authd.AuthdRequestHandler.set_nova_client(nova_client)
 
